@@ -3,9 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import heroImage from '../../assets/Carlos-Quintero-na-Unsplash.jpg';
 
 const landingPageContent = {
-  title: 'Lucas Storache Fotografia',
-  subtitle: 'Capturando momentos que duram para sempre.',
-  buttonText: 'Shtorache',
+  title: 'Lucas Shtorache',
 };
 
 function LandingPage() {
@@ -16,8 +14,8 @@ function LandingPage() {
         backgroundImage: `url(${heroImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        height: '100vh',
-        width: '100vw',
+        height: '100vh',  
+        width: '100vw',   
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -45,21 +43,25 @@ function LandingPage() {
         }}
       >
         <Typography
-          variant="h1"
           component="a"
-          href="https://www.google.com"
-          sx={{
-            color: 'white',
-            textDecoration: 'none',
-            '&:hover': {
-              textDecoration: 'none',
-              color: 'white',
-            },
-            fontWeight: 700,
-            mb: 2,
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-            fontSize: { xs: '2.5rem', md: '5rem' },
-          }}
+          href='https://www.google.com'
+          variant="h1"
+  sx={{
+    color: 'white', // Defina a cor do seu texto aqui
+    textDecoration: 'none', // Remove o sublinhado
+    
+    // Esta parte garante que a cor e o sublinhado NÃO mudem ao passar o mouse
+    '&:hover': {
+      color: 'white',
+      textDecoration: 'none',
+    },
+
+    // Estilos de texto
+    fontWeight: 400,
+    mb: 4,
+    textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)',
+    fontSize: { xs: '1.2rem', md: '1.5rem' },
+  }}
         >
           {landingPageContent.title}
         </Typography>
