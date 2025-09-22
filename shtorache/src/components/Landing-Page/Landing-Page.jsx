@@ -14,6 +14,8 @@ function LandingPage() {
         backgroundImage: `url(${heroImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        height: '100dvh', 
+        minHeight: '-webkit-fill-available', 
         height: '100vh',  
         width: '100vw',   
         display: 'flex',
