@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import heroImage from '../../assets/Carlos-Quintero-na-Unsplash.jpg';
+import { Link } from 'react-router-dom'; 
 
 const landingPageContent = {
   title: 'Lucas Shtorache',
@@ -14,8 +15,8 @@ function LandingPage() {
         backgroundImage: `url(${heroImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        // Usando 100dvh é o suficiente para a maioria dos casos
         height: '100dvh', 
-        minHeight: '-webkit-fill-available', 
         width: '100vw',   
         display: 'flex',
         justifyContent: 'center',
@@ -44,25 +45,21 @@ function LandingPage() {
         }}
       >
         <Typography
-          component="a"
-          href='https://www.google.com'
-          variant="h1"
-  sx={{
-    color: 'white', // Defina a cor do seu texto aqui
-    textDecoration: 'none', // Remove o sublinhado
-    
-    // Esta parte garante que a cor e o sublinhado NÃO mudem ao passar o mouse
-    '&:hover': {
-      color: 'white',
-      textDecoration: 'none',
-    },
+          component={Link}
+          to="/home"
+          variant="h5"
+          sx={{
+            color: 'white', 
+            textDecoration: 'none', 
+            
+            '&:hover': {
+              color: 'white',
+              textDecoration: 'none',
+            },
 
-    // Estilos de texto
-    fontWeight: 400,
-    mb: 4,
-    textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)',
-    fontSize: { xs: '1.2rem', md: '1.5rem' },
-  }}
+            fontWeight: 'light', 
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+          }}
         >
           {landingPageContent.title}
         </Typography>
