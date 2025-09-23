@@ -1,16 +1,17 @@
-import { useState } from 'react'
-import LandingPage from './components/Landing-Page/Landing-Page'
-import CssBaseline from '@mui/material/CssBaseline';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './components/Landing-Page/Landing-Page';
+import HomePage from './components/Home-Page/Home-page';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div style={{ margin: 0, padding: 0 }}>
-      <CssBaseline />
-      <LandingPage />
-    </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/home" element={<HomePage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
