@@ -7,12 +7,10 @@ import { Box } from '@mui/system';
 function App() {
   return (
     <Router>
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/home" element={<HomePage />} />
-      </Routes>
-      </Box>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<HomePage />} />
+        </Routes>
     </Router>
   );
 }
