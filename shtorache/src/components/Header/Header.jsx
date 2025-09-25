@@ -43,6 +43,13 @@ function Header() {
     setVideosAnchorEl(null);
   };
 
+  // Textos 
+
+  const homePageContent ={
+    title: 'Lucas Shtorache',
+
+  }
+
   return (
     <AppBar
       position="fixed"
@@ -62,7 +69,7 @@ function Header() {
             fontWeight: 'light',
           }}
         >
-          Lucas Shtorache
+          {homePageContent.title}
         </Typography>
 
         {/* Links de Navegação (Desktop) */}
