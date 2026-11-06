@@ -9,7 +9,7 @@ React + Vite + MUI. O conteúdo da galeria vem direto do Instagram
 | Rota        | Conteúdo                                                        |
 | ----------- | --------------------------------------------------------------- |
 | `/`         | Vídeo em loop, tela cheia, P&B com barras de cinema e granulação |
-| `/trabalho` | Todos os posts do Instagram (masonry + lightbox)                 |
+| `/trabalho` | Todos os posts do Instagram — masonry + lightbox no desktop, lista no celular |
 | `/fotos`    | Posts de imagem e carrosséis                                     |
 | `/videos`   | Reels / vídeos (tocam no lightbox)                               |
 | `/contato`  | Bio e contato                                                    |
@@ -58,6 +58,11 @@ Renove o token antes de expirar (ex.: um cron mensal):
 ```bash
 curl "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=$INSTAGRAM_ACCESS_TOKEN"
 ```
+
+A API é paginada (`/api/instagram?after=<cursor>`, `INSTAGRAM_PAGE_SIZE` posts por página,
+padrão 12): a galeria carrega a próxima página sozinha ao chegar no fim (scroll infinito).
+No celular os posts aparecem em lista de coluna única, de ponta a ponta; carrosséis
+deslizam para o lado e vídeos tocam sem som quando entram na tela (toque liga o som).
 
 A resposta da API fica em cache na CDN por 1 h (`s-maxage=3600`), então posts novos
 aparecem sozinhos.

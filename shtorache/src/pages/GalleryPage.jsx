@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
-import { Box, Typography, Skeleton } from '@mui/material';
+import { Box, Typography, Skeleton, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import Gallery from '../components/Gallery/Gallery';
+import FeedList from '../components/Gallery/FeedList';
+import InfiniteSentinel from '../components/Gallery/InfiniteSentinel';
 import { useInstagramFeed } from '../hooks/useInstagramFeed';
 import { site } from '../config';
 
@@ -12,13 +15,13 @@ const copy = {
 
 function PageShell({ title, count, children }) {
   return (
-    <Box sx={{ pt: { xs: 12, sm: 16 }, pb: 10, px: { xs: 1, sm: 4 } }}>
+    <Box sx={{ pt: { xs: 12, sm: 16 }, pb: 10, px: { xs: 0, sm: 4 } }}>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          px: { xs: 1, sm: 0 },
+          px: { xs: 2, sm: 0 },
           mb: { xs: 4, sm: 6 },
         }}
       >
@@ -42,14 +45,14 @@ function PageShell({ title, count, children }) {
 function Loading() {
   const heights = [320, 220, 280, 360, 240, 300, 260, 340];
   return (
-    <Box sx={{ columnCount: { xs: 2, sm: 3, lg: 4 }, columnGap: { xs: '4px', sm: '10px' } }}>
+    <Box sx={{ columnCount: { xs: 1, sm: 3, lg: 4 }, columnGap: '10px' }}>
       {heights.map((h, i) => (
         <Skeleton
           key={i}
           variant="rectangular"
           animation="wave"
           height={h}
-          sx={{ mb: { xs: '4px', sm: '10px' }, bgcolor: '#141414', breakInside: 'avoid' }}
+          sx={{ mb: { xs: 5, sm: '10px' }, bgcolor: '#141414', breakInside: 'avoid' }}
         />
       ))}
     </Box>
@@ -58,7 +61,7 @@ function Loading() {
 
 function Message({ children }) {
   return (
-    <Box sx={{ py: 10, px: { xs: 1, sm: 0 }, maxWidth: 520 }}>
+    <Box sx={{ py: 10, px: { xs: 2, sm: 0 }, maxWidth: 520 }}>
       <Typography sx={{ color: 'text.secondary', fontWeight: 300, lineHeight: 1.8 }}>{children}</Typography>
       <Typography
         component="a"
@@ -75,7 +78,9 @@ function Message({ children }) {
 }
 
 function GalleryPage({ filter }) {
-  const { status, items } = useInstagramFeed();
+  const { status, items, hasMore, loadingMore, loadMore } = useInstagramFeed();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { title, empty } = copy[filter];
   const filtered = filter === 'all' ? items : items.filter((p) => p.kind === filter);
 
@@ -85,13 +90,22 @@ function GalleryPage({ filter }) {
   }, [title]);
 
   return (
-    <PageShell title={title} count={status === 'ready' ? filtered.length : null}>
+    <PageShell title={title} count={status === 'ready' && !hasMore ? filtered.length : null}>
       {status === 'loading' && <Loading />}
       {status === 'error' && (
         <Message>O feed do Instagram não pôde ser carregado agora. O trabalho completo está no perfil.</Message>
       )}
-      {status === 'ready' && filtered.length === 0 && <Message>{empty}</Message>}
-      {status === 'ready' && filtered.length > 0 && <Gallery items={filtered} />}
+      {status === 'ready' && filtered.length === 0 && !hasMore && <Message>{empty}</Message>}
+      {status === 'ready' && filtered.length > 0 &&
+        (isMobile ? <FeedList items={filtered} /> : <Gallery items={filtered} />)}
+      {status === 'ready' && (
+        <InfiniteSentinel
+          onLoadMore={loadMore}
+          hasMore={hasMore}
+          loading={loadingMore}
+          count={filtered.length}
+        />
+      )}
     </PageShell>
   );
 }

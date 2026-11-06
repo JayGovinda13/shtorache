@@ -39,50 +39,55 @@ function normalize(item) {
   };
 }
 
-export async function fetchInstagramFeed({ token, limit = 60 } = {}) {
+// Busca UMA página do feed. `after` é o cursor devolvido na página anterior.
+export async function fetchInstagramPage({ token, after, limit = 12 } = {}) {
   if (!token) {
     const err = new Error('INSTAGRAM_ACCESS_TOKEN não configurado');
     err.status = 503;
     throw err;
   }
 
-  const items = [];
-  let url = `${GRAPH}/me/media?fields=${encodeURIComponent(FIELDS)}&limit=${Math.min(limit, 50)}&access_token=${encodeURIComponent(token)}`;
+  const params = new URLSearchParams({
+    fields: FIELDS,
+    limit: String(Math.min(Math.max(limit, 1), 50)),
+    access_token: token,
+  });
+  if (after) params.set('after', after);
 
-  while (url && items.length < limit) {
-    const res = await fetch(url);
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok || body.error) {
-      const err = new Error(body.error?.message ?? `Instagram respondeu ${res.status}`);
-      err.status = 502;
-      throw err;
-    }
-    items.push(...(body.data ?? []));
-    url = body.paging?.next ?? null;
+  const res = await fetch(`${GRAPH}/me/media?${params}`);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok || body.error) {
+    const err = new Error(body.error?.message ?? `Instagram respondeu ${res.status}`);
+    err.status = 502;
+    throw err;
   }
 
-  return items
-    .slice(0, limit)
-    .map(normalize)
-    .filter((p) => p.thumb && p.slides.length);
+  return {
+    items: (body.data ?? []).map(normalize).filter((p) => p.thumb && p.slides.length),
+    // Só há próxima página quando o Instagram devolve `paging.next`.
+    next: body.paging?.next ? body.paging?.cursors?.after ?? null : null,
+  };
 }
 
 // Handler no formato Node (req, res) — compatível com Vercel e com o middleware do Vite.
+// GET /api/instagram?after=<cursor>
 export async function instagramHandler(req, res, env = process.env) {
   try {
-    const items = await fetchInstagramFeed({
+    const query = new URL(req.url ?? '/', 'http://localhost').searchParams;
+    const page = await fetchInstagramPage({
       token: env.INSTAGRAM_ACCESS_TOKEN,
-      limit: Number(env.INSTAGRAM_LIMIT) || 60,
+      after: query.get('after') || undefined,
+      limit: Number(env.INSTAGRAM_PAGE_SIZE) || 12,
     });
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     // As URLs de mídia do Instagram expiram; cache curto na CDN.
     res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-    res.end(JSON.stringify({ items }));
+    res.end(JSON.stringify(page));
   } catch (err) {
     res.statusCode = err.status ?? 500;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
-    res.end(JSON.stringify({ items: [], error: err.message }));
+    res.end(JSON.stringify({ items: [], next: null, error: err.message }));
   }
 }
